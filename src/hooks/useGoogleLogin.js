@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { loginWithGoogleCode } from "../services/Serviceapi";
+import { loginWithGoogleCode, getCurrentUser } from "../services/Serviceapi";
 
 const GOOGLE_CLIENT_ID =
   process.env.REACT_APP_GOOGLE_CLIENT_ID ||
@@ -19,7 +19,9 @@ const loadGoogleScript = () => {
       return;
     }
 
-    const existing = document.querySelector(`script[src="${GOOGLE_SCRIPT_SRC}"]`);
+    const existing = document.querySelector(
+      `script[src="${GOOGLE_SCRIPT_SRC}"]`,
+    );
     if (existing) {
       if (existing.dataset && existing.dataset.loaded) {
         resolve();
@@ -27,7 +29,9 @@ const loadGoogleScript = () => {
       }
       const onLoad = () => resolve();
       existing.addEventListener("load", onLoad, { once: true });
-      existing.addEventListener("error", () => reject(new Error("Google script failed to load")));
+      existing.addEventListener("error", () =>
+        reject(new Error("Google script failed to load")),
+      );
       return;
     }
 
@@ -53,7 +57,9 @@ export const useGoogleLogin = () => {
 
     const initGoogle = () => {
       if (!window.google) {
-        console.error("Google script loaded but `window.google` is unavailable");
+        console.error(
+          "Google script loaded but `window.google` is unavailable",
+        );
         return;
       }
 
@@ -71,6 +77,7 @@ export const useGoogleLogin = () => {
           try {
             const data = await loginWithGoogleCode(response.code);
             storeUserLocally(data);
+           
             window.location.reload();
           } catch (err) {
             console.error("Google login error:", err);

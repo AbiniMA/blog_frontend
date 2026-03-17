@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 import GoogleLogin from "../components/google/GoogleLogin";
 
 function Navbar() {
@@ -7,13 +7,13 @@ function Navbar() {
   return (
     <>
       <nav className="flex flex-wrap items-center justify-between  my-4 gap-6 w-[80%] mx-auto">
-        <div className="flex items-center gap-3">
+       <Link to="/"> <div className="flex items-center gap-3">
           <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#1c64f2] text-lg font-semibold text-white shadow-lg shadow-[#1c64f2]/30">
             AI
           </div>
           <span className="text-lg font-semibold tracking-tight">AIBlog</span>
         </div>
-
+</Link>
 
         <div className="flex items-center gap-4 text-sm font-medium text-slate-600">
 

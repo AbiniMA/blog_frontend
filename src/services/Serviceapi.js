@@ -15,12 +15,39 @@ export const getCategories = async () => {
   return handleResponse(response)
 }
 
-export const loginWithGoogleCode = async (code) => {
-  const response = await apiInstance.post(GOOGLE_LOGIN_PATH, { code })
+export const getBlogs = async (catId, searchText) => {
+  const response = await apiInstance.get(`/blog/blogs/?category=${catId}&search=${searchText}`)
   return handleResponse(response)
 }
 
+export const getBlogDetail = async (id) => {
+  if (!id) {
+    throw new Error("Blog ID is required for detail requests")
+  }
+  const response = await apiInstance.get(`blog/blogs/${id}/`)
+  return handleResponse(response)
+}
+
+export const loginWithGoogleCode = async (code) => {
+  const response = await apiInstance.post(GOOGLE_LOGIN_PATH, { code },{ withCredentials: true })
+  return handleResponse(response)
+}
+
+export const postComment = async (blogId, payload) => {
+  const response = await apiInstance.post(`/blog/blogs/${blogId}/comments/`, payload, { withCredentials: true })
+  return handleResponse(response)
+
+}
+
+export const getCurrentUser = async () => {
+  const response = await apiInstance.get("/user/user/")
+  return handleResponse(response)
+}
 export default {
   getCategories,
+  getBlogs,
+  getBlogDetail,
   loginWithGoogleCode,
+  postComment,
+  getCurrentUser,
 }

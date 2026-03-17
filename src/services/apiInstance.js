@@ -1,11 +1,26 @@
-
-import axios from 'axios';
+import axios from "axios";
 
 const BASE_URL =
-  (process.env.REACT_APP_API_BASE || "http://127.0.0.1:8000/api/").replace(/\/+$/, "");
+  (process.env.REACT_APP_API_BASE || "http://localhost:8000/api/").replace(/\/+$/, "");
+
+const getCookie = (name) => {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(";").shift();
+  return "";
+};
 
 const apiInstance = axios.create({
   baseURL: BASE_URL,
+  withCredentials: true,
+});
+
+apiInstance.interceptors.request.use((config) => {
+  const csrfToken = getCookie("csrftoken");
+  if (csrfToken) {
+    config.headers["X-CSRFToken"] = csrfToken;
+  }
+  return config;
 });
 
 export default apiInstance;
