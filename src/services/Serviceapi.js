@@ -16,7 +16,7 @@ export const getCategories = async () => {
 }
 
 export const getBlogs = async (catId, searchText) => {
-  const response = await apiInstance.get(`/blog/blogs/?category=${catId}&search=${searchText}`)
+  const response = await apiInstance.get(`blog/blogs/?category=${catId}&search=${searchText}`)
   return handleResponse(response)
 }
 
@@ -33,8 +33,6 @@ export const getDashboardStats = async () => {
   return handleResponse(response)
 }
 
-
-
 export const generateBlogDescription = async (payload) => {
   const response = await apiInstance.post("generate-blog/generate-description/", payload)
   return handleResponse(response)
@@ -46,34 +44,30 @@ export const deleteBlog = async (id) => {
 }
 
 export const createBlog = async (payload) => {
-  const response = await apiInstance.post("blog/blogs/", payload, {
-    withCredentials: true, // keep this if using session auth
-  })
+  const response = await apiInstance.post("blog/blogs/", payload)
   return handleResponse(response)
 }
 
 export const updateBlog = async (id, payload) => {
-  const response = await apiInstance.put(`blog/blogs/${id}/`, payload, {
-    withCredentials: true,
-  })
+  const response = await apiInstance.put(`blog/blogs/${id}/`, payload)
   return handleResponse(response)
 }
 
 export const loginWithGoogleCode = async (code) => {
-  const response = await apiInstance.post(GOOGLE_LOGIN_PATH, { code },{ withCredentials: true })
+  const response = await apiInstance.post(GOOGLE_LOGIN_PATH, { code })
   return handleResponse(response)
 }
 
 export const postComment = async (blogId, payload) => {
-  const response = await apiInstance.post(`/blog/blogs/${blogId}/comments/`, payload, { withCredentials: true })
+  const response = await apiInstance.post(`blog/blogs/${blogId}/comments/`, payload)
   return handleResponse(response)
-
 }
 
 export const getCurrentUser = async () => {
-  const response = await apiInstance.get("/user/user/")
+  const response = await apiInstance.get("user/user/")
   return handleResponse(response)
 }
+
 const serviceApi = {
   getCategories,
   getBlogs,
