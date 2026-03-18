@@ -32,10 +32,10 @@ const HomeBanner = () => {
   }
 
   const handleExploreClick = () => {
-    if (!user) {
-      showToast("Log in first to explore posts.")
-      return
-    }
+    // if (!user) {
+    //   showToast("Log in first to explore posts.")
+    //   return
+    // }
 
     navigate("/explore")
   }
@@ -44,6 +44,8 @@ const HomeBanner = () => {
     if (!user) {
       showToast("Log in first to start writing.")
       return
+    }else {
+      navigate("/add-blog")
     }
 
     showToast("Start writing is coming soon.")

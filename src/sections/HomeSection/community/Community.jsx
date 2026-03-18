@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState, useEffect } from "react"
 import { useGoogleLogin } from "../../../hooks/useGoogleLogin"
+import { Link, Navigate, useNavigate } from "react-router-dom"
 
 const scrollToId = (id) => {
   const el = document.getElementById(id)
@@ -11,6 +12,7 @@ const Community = () => {
   const { requestLogin, ready } = useGoogleLogin()
   const [toast, setToast] = useState("")
   const toastTimerRef = useRef(null)
+  const navigate = useNavigate()
   const user = useMemo(() => {
     try {
       return JSON.parse(localStorage.getItem("user"))
@@ -44,11 +46,13 @@ const Community = () => {
       showToast("You need to log in first.")
       requestLogin()
       return
+    } else {
+      navigate("/dashboard")
     }
     scrollToId("featured-posts")
   }
 
- 
+
   return (
     <section className="bg-[#e9efff] py-20">
       <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 px-6 text-center">
@@ -64,13 +68,12 @@ const Community = () => {
           <button
             onClick={handleGetStarted}
             disabled={!ready}
-            className={`rounded-full bg-blue-600 px-8 py-3 text-base font-semibold text-white shadow-lg shadow-blue-200 transition ${
-              ready ? "hover:bg-blue-700" : "cursor-wait opacity-80"
-            }`}
+            className={`rounded-full bg-blue-600 px-8 py-3 text-base font-semibold text-white shadow-lg shadow-blue-200 transition ${ready ? "hover:bg-blue-700" : "cursor-wait opacity-80"
+              }`}
           >
             Get Started Free
           </button>
-        
+
         </div>
       </div>
       {toast && (

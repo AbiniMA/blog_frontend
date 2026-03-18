@@ -28,6 +28,37 @@ export const getBlogDetail = async (id) => {
   return handleResponse(response)
 }
 
+export const getDashboardStats = async () => {
+  const response = await apiInstance.get("blog/dashboard/stats/")
+  return handleResponse(response)
+}
+
+
+
+export const generateBlogDescription = async (payload) => {
+  const response = await apiInstance.post("generate-blog/generate-description/", payload)
+  return handleResponse(response)
+}
+
+export const deleteBlog = async (id) => {
+  const response = await apiInstance.delete(`blog/blogs/${id}/`)
+  return handleResponse(response)
+}
+
+export const createBlog = async (payload) => {
+  const response = await apiInstance.post("blog/blogs/", payload, {
+    withCredentials: true, // keep this if using session auth
+  })
+  return handleResponse(response)
+}
+
+export const updateBlog = async (id, payload) => {
+  const response = await apiInstance.put(`blog/blogs/${id}/`, payload, {
+    withCredentials: true,
+  })
+  return handleResponse(response)
+}
+
 export const loginWithGoogleCode = async (code) => {
   const response = await apiInstance.post(GOOGLE_LOGIN_PATH, { code },{ withCredentials: true })
   return handleResponse(response)
@@ -50,4 +81,9 @@ export default {
   loginWithGoogleCode,
   postComment,
   getCurrentUser,
+  createBlog,
+  generateBlogDescription,
+  deleteBlog,
+  updateBlog,
+  getDashboardStats,
 }

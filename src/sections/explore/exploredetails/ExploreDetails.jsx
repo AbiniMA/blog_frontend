@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useLocation, useParams } from "react-router-dom"
-import { getBlogDetail, postComment , getCurrentUser} from "../../../services/Serviceapi"
+import { getBlogDetail, postComment, getCurrentUser } from "../../../services/Serviceapi"
 
 const formatDate = (value) => {
   if (!value) return ""
@@ -33,6 +33,9 @@ const timeAgo = (value) => {
   return formatDate(value)
 }
 
+  const TOAST_DURATION = 2800
+
+
 const ExploreDetails = () => {
   const location = useLocation()
   const cachedPost = location.state?.cachedPost
@@ -46,6 +49,16 @@ const ExploreDetails = () => {
   const [isPostingComment, setIsPostingComment] = useState(false)
   const [commentError, setCommentError] = useState("")
 
+  const timerRef = useRef(null)
+
+    useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        window.clearTimeout(timerRef.current)
+      }
+    }
+  }, [])
+
   const fetchBlogDetail = async () => {
     if (!postId) return
 
@@ -55,8 +68,8 @@ const ExploreDetails = () => {
 
       const data = await getBlogDetail(postId)
       setPost(data.data || data)
-       const user = await getCurrentUser();
-            console.log("Logged in user:", user);
+      const user = await getCurrentUser();
+      console.log("Logged in user:", user);
     } catch (err) {
       console.error("Failed to load blog detail", err)
       setDetailError("We couldn't load this story right now.")
@@ -68,59 +81,73 @@ const ExploreDetails = () => {
   useEffect(() => {
     fetchBlogDetail()
   }, [postId])
+  const [toast, setToast] = useState("")
 
- const handlePostComment = async () => {
-  if (!commentText.trim()) return
-
-  const user = JSON.parse(localStorage.getItem("user"))
-
-  try {
-    setIsPostingComment(true)
-    setCommentError("")
-
-    await postComment(postId, {
-      blog: Number(postId),
-      user: user?.id,   // 🔥 important
-      content: commentText,
-    })
-
-    setCommentText("")
-    fetchBlogDetail()
-  } catch (err) {
-    console.error("Failed to post comment", err)
-    setCommentError("Unable to post comment right now.")
-  } finally {
-    setIsPostingComment(false)
+  const showToast = (message) => {
+    setToast(message)
+    if (timerRef.current) {
+      window.clearTimeout(timerRef.current)
+    }
+    timerRef.current = window.setTimeout(() => setToast(""), TOAST_DURATION)
   }
-}
+  const handlePostComment = async () => {
+    if (!commentText.trim()) return
 
-const [shareMessage, setShareMessage] = useState("")
-const handleShare = async () => {
-  const shareUrl = window.location.href
+    const user = JSON.parse(localStorage.getItem("user"))
 
-  const shareData = {
-    title: post?.title || "Check out this blog post",
-    text: post?.content
-      ? `${post.content.slice(0, 120)}...`
-      : "Read this blog post",
-    url: shareUrl,
-  }
-
-  try {
-    if (navigator.share) {
-      await navigator.share(shareData)
+    if (!user) {
+      showToast("Log in first to explore posts.")
       return
     }
 
-    await navigator.clipboard.writeText(shareUrl)
-    setShareMessage("Link copied!")
-    setTimeout(() => setShareMessage(""), 2000)
-  } catch (err) {
-    console.error("Share failed", err)
-    setShareMessage("Unable to share right now.")
-    setTimeout(() => setShareMessage(""), 2000)
+
+    try {
+      setIsPostingComment(true)
+      setCommentError("")
+
+      await postComment(postId, {
+        blog: Number(postId),
+        user: user?.id,   // 🔥 important
+        content: commentText,
+      })
+
+      setCommentText("")
+      fetchBlogDetail()
+    } catch (err) {
+      console.error("Failed to post comment", err)
+      setCommentError("Unable to post comment right now.")
+    } finally {
+      setIsPostingComment(false)
+    }
   }
-}
+
+  const [shareMessage, setShareMessage] = useState("")
+  const handleShare = async () => {
+    const shareUrl = window.location.href
+
+    const shareData = {
+      title: post?.title || "Check out this blog post",
+      text: post?.content
+        ? `${post.content.slice(0, 120)}...`
+        : "Read this blog post",
+      url: shareUrl,
+    }
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData)
+        return
+      }
+
+      await navigator.clipboard.writeText(shareUrl)
+      setShareMessage("Link copied!")
+      setTimeout(() => setShareMessage(""), 2000)
+    } catch (err) {
+      console.error("Share failed", err)
+      setShareMessage("Unable to share right now.")
+      setTimeout(() => setShareMessage(""), 2000)
+    }
+  }
   return (
     <div className="min-h-screen bg-slate-50">
       <section className="border-b border-slate-200 bg-white">
@@ -131,7 +158,7 @@ const handleShare = async () => {
                 {post.category_name ?? "Community"}
               </span>
               <h1 className="text-4xl font-bold text-slate-900">{post.title}</h1>
-              <div className="flex flex-wrap items-center gap-3 text-sm text-slate-500">
+              <div className="flex flex-wrap items-center gap-3 text-md text-slate-500">
                 <span>{post.user_name || "Community"}</span>
                 <span>·</span>
                 <span>{formatDate(post.created_at)}</span>
@@ -166,30 +193,31 @@ const handleShare = async () => {
         )}
 
         {post?.content && (
-          <p className="mt-6 whitespace-pre-line text-base leading-relaxed text-slate-600">
+          <p className="mt-6 whitespace-pre-line text-[20px] leading-relaxed text-slate-600">
             {post.content}
           </p>
         )}
 
         <div className="mt-8 flex flex-wrap items-center gap-6 border-t border-slate-100 pt-6 text-sm text-slate-500">
           <span className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-xs font-bold text-slate-500">
+            <span className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 bg-white text-md font-bold text-slate-500">
               💬
             </span>
-            {post?.comments_count || 0}
+            <span className="text-lg font-semibold">            {post?.comments_count || 0}
+            </span>
           </span>
 
-           <button
-    onClick={handleShare}
-    className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-600 transition hover:border-slate-400"
-  >
-    Share
-  </button>
+          <button
+            onClick={handleShare}
+            className="rounded-full  bg-blue-500  border border-slate-200 px-3 py-1 text-md font-semibold text-white transition hover:border-slate-400"
+          >
+            Share
+          </button>
         </div>
 
         <div className="mt-10 rounded-[20px] border border-slate-200 bg-white p-6 shadow-[0_20px_50px_rgba(15,23,42,0.08)]">
-          <h4 className="text-base font-semibold text-slate-900">Comments</h4>
-          <p className="text-sm text-slate-500">Share your thoughts…</p>
+          <h4 className="text-xl  font-semibold text-slate-900">Comments</h4>
+          <p className="text-md text-slate-500">Share your thoughts…</p>
 
           <textarea
             rows={3}
@@ -229,7 +257,7 @@ const handleShare = async () => {
                         {timeAgo(comment.created_at)}
                       </p>
 
-                      <p className="mt-3 text-base leading-relaxed text-slate-700">
+                      <p className="mt-3 text-[15px] leading-relaxed text-slate-700">
                         {comment.content}
                       </p>
                     </div>
@@ -242,6 +270,11 @@ const handleShare = async () => {
           </div>
         </div>
       </section>
+        {toast && (
+        <div className="pointer-events-none fixed bottom-6 left-1/2 -translate-x-1/2 rounded-full bg-slate-950 px-6 py-3 text-sm font-semibold text-white shadow-xl shadow-slate-900/60">
+          {toast}
+        </div>
+      )}
     </div>
   )
 }
