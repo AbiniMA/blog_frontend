@@ -1,6 +1,6 @@
 import React, { useMemo, useRef, useState, useEffect } from "react"
 import { useGoogleLogin } from "../../../hooks/useGoogleLogin"
-import { Link, Navigate, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 const scrollToId = (id) => {
   const el = document.getElementById(id)

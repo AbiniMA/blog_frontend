@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { useLocation, useParams } from "react-router-dom"
-import { getBlogDetail, postComment, getCurrentUser } from "../../../services/Serviceapi"
+import { getBlogDetail, postComment } from "../../../services/Serviceapi"
 
 const formatDate = (value) => {
   if (!value) return ""
@@ -33,7 +33,7 @@ const timeAgo = (value) => {
   return formatDate(value)
 }
 
-  const TOAST_DURATION = 2800
+const TOAST_DURATION = 2800
 
 
 const ExploreDetails = () => {
@@ -59,7 +59,7 @@ const ExploreDetails = () => {
     }
   }, [])
 
-  const fetchBlogDetail = async () => {
+  const fetchBlogDetail = useCallback(async () => {
     if (!postId) return
 
     try {
@@ -68,19 +68,17 @@ const ExploreDetails = () => {
 
       const data = await getBlogDetail(postId)
       setPost(data.data || data)
-      const user = await getCurrentUser();
-      console.log("Logged in user:", user);
     } catch (err) {
       console.error("Failed to load blog detail", err)
       setDetailError("We couldn't load this story right now.")
     } finally {
       setIsLoadingDetail(false)
     }
-  }
+  }, [postId])
 
   useEffect(() => {
     fetchBlogDetail()
-  }, [postId])
+  }, [fetchBlogDetail])
   const [toast, setToast] = useState("")
 
   const showToast = (message) => {
@@ -121,7 +119,6 @@ const ExploreDetails = () => {
     }
   }
 
-  const [shareMessage, setShareMessage] = useState("")
   const handleShare = async () => {
     const shareUrl = window.location.href
 
@@ -136,16 +133,15 @@ const ExploreDetails = () => {
     try {
       if (navigator.share) {
         await navigator.share(shareData)
+        showToast("Link shared!")
         return
       }
 
       await navigator.clipboard.writeText(shareUrl)
-      setShareMessage("Link copied!")
-      setTimeout(() => setShareMessage(""), 2000)
+      showToast("Link copied!")
     } catch (err) {
       console.error("Share failed", err)
-      setShareMessage("Unable to share right now.")
-      setTimeout(() => setShareMessage(""), 2000)
+      showToast("Unable to share right now.")
     }
   }
   return (

@@ -74,7 +74,7 @@ export const getCurrentUser = async () => {
   const response = await apiInstance.get("/user/user/")
   return handleResponse(response)
 }
-export default {
+const serviceApi = {
   getCategories,
   getBlogs,
   getBlogDetail,
@@ -87,3 +87,5 @@ export default {
   updateBlog,
   getDashboardStats,
 }
+
+export default serviceApi

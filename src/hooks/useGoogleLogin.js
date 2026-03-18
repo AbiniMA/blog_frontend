@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { loginWithGoogleCode, getCurrentUser } from "../services/Serviceapi";
+import { loginWithGoogleCode } from "../services/Serviceapi";
 
 const GOOGLE_CLIENT_ID =
   process.env.REACT_APP_GOOGLE_CLIENT_ID ||

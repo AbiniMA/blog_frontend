@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { getBlogs, getCategories } from "../../services/Serviceapi"
 
@@ -16,19 +16,22 @@ const PostExplore = () => {
     navigate(`/explore/details/${post.id}`)
   }
 
-  const fetchPosts = async (selectedCategory = category, currentSearch = searchTerm) => {
-    try {
-      setIsLoadingPosts(true)
-      const data = await getBlogs(selectedCategory, currentSearch)
-      setPosts(Array.isArray(data) ? data : [])
-      setPostError("")
-    } catch (err) {
-      console.error("Failed to load blog posts", err)
-      setPostError("We couldn't fetch the latest posts right now.")
-    } finally {
-      setIsLoadingPosts(false)
-    }
-  }
+  const fetchPosts = useCallback(
+    async (selectedCategory = category, currentSearch = searchTerm) => {
+      try {
+        setIsLoadingPosts(true)
+        const data = await getBlogs(selectedCategory, currentSearch)
+        setPosts(Array.isArray(data) ? data : [])
+        setPostError("")
+      } catch (err) {
+        console.error("Failed to load blog posts", err)
+        setPostError("We couldn't fetch the latest posts right now.")
+      } finally {
+        setIsLoadingPosts(false)
+      }
+    },
+    [category, searchTerm],
+  )
 
   useEffect(() => {
     getCategories()
@@ -42,11 +45,11 @@ const PostExplore = () => {
 
   useEffect(() => {
     const delay = setTimeout(() => {
-      fetchPosts(category, searchTerm)
+      fetchPosts()
     }, 300)
 
     return () => clearTimeout(delay)
-  }, [category, searchTerm])
+  }, [fetchPosts])
 
   const showEmptyMessage = !isLoadingPosts && posts.length === 0
 
