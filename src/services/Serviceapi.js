@@ -54,18 +54,9 @@ export const updateBlog = async (id, payload) => {
 }
 
 export const loginWithGoogleCode = async (code) => {
-  const response = await apiInstance.post(
-    "/user/google-login/",
-    { code },
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
-
-  return response.data;
-};
+  const response = await apiInstance.post(GOOGLE_LOGIN_PATH, { code })
+  return handleResponse(response)
+}
 
 export const postComment = async (blogId, payload) => {
   const response = await apiInstance.post(`blog/blogs/${blogId}/comments/`, payload)
