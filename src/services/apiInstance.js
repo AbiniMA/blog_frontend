@@ -8,11 +8,13 @@ const apiInstance = axios.create({
   baseURL: BASE_URL,
 });
 
-// 🔥 Attach JWT token automatically
 apiInstance.interceptors.request.use((config) => {
   const token = localStorage.getItem("access_token");
 
-  if (token) {
+  const isGoogleLoginRequest =
+    config.url && config.url.includes("/user/google-login/");
+
+  if (token && !isGoogleLoginRequest) {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
